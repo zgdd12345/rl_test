@@ -1,0 +1,75 @@
+import pygame
+import time
+from maze_env import MazeEnv
+from rl_agent import QLearningAgent
+
+# 初始化
+pygame.init()
+env = MazeEnv()
+agent = QLearningAgent(env)
+CELL_SIZE = 50
+WINDOW_SIZE = (10*CELL_SIZE, 10*CELL_SIZE)
+screen = pygame.display.set_mode(WINDOW_SIZE)
+pygame.display.set_caption("Maze RL")
+
+# 颜色定义
+WHITE = (255,255,255)
+BLACK = (0,0,0)
+GREEN = (0,255,0)
+RED = (255,0,0)
+BLUE = (0,0,255)
+GRAY = (200,200,200)
+
+def draw_maze():
+    for x in range(10):
+        for y in range(10):
+            rect = pygame.Rect(y*CELL_SIZE, x*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            if env.maze[x,y] == 1:
+                pygame.draw.rect(screen, BLACK, rect)
+            else:
+                pygame.draw.rect(screen, WHITE, rect)
+            pygame.draw.rect(screen, GRAY, rect, 1)
+    
+    # 绘制目标
+    goal_rect = pygame.Rect(env.goal_pos[1]*CELL_SIZE, 
+                           env.goal_pos[0]*CELL_SIZE, 
+                           CELL_SIZE, CELL_SIZE)
+    pygame.draw.rect(screen, GREEN, goal_rect)
+    
+    # 绘制智能体
+    agent_rect = pygame.Rect(env.agent_pos[1]*CELL_SIZE+CELL_SIZE//4,
+                            env.agent_pos[0]*CELL_SIZE+CELL_SIZE//4,
+                            CELL_SIZE//2, CELL_SIZE//2)
+    pygame.draw.ellipse(screen, BLUE, agent_rect)
+
+# 主循环
+running = True
+clock = pygame.time.Clock()
+for episode in range(100):
+    state = env.reset()
+    done = False
+    
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        
+        if not running:
+            break
+            
+        # RL步骤
+        action = agent.choose_action(state)
+        next_state, reward, done, _ = env.step(action)
+        agent.learn(state, action, reward, next_state)
+        state = next_state
+        
+        # 渲染
+        screen.fill(WHITE)
+        draw_maze()
+        pygame.display.flip()
+        clock.tick(100)  # 控制渲染速度
+        
+    if not running:
+        break
+
+pygame.quit()
