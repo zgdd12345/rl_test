@@ -3,30 +3,20 @@ import gym
 from gym import spaces
 import numpy as np
 
+from maze_matrix import maze_matrix  # 假设maze_matrix.py在同一目录下   
+
 class MazeEnv(gym.Env):
     def __init__(self):
-        # 10x10迷宫，0=可通行，1=障碍
-        self.maze = np.array([
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-            [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
-            [1, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 1, 0, 1],
-            [1, 0, 1, 1, 1, 1, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
-        ])
-        
-        self.start_pos = (1, 0)  # 起点
-        self.goal_pos = (9, 6)   # 终点
+        # 16x16迷宫，0=可通行，1=障碍
+        self.maze = maze_matrix
+        self.start_pos = (0, 0)  # 起点
+        self.goal_pos = (15, 15)   # 终点
         self.agent_pos = list(self.start_pos)
         
         # 动作空间：上下左右
         self.action_space = spaces.Discrete(4)
         # 观察空间：智能体坐标
-        self.observation_space = spaces.Box(low=0, high=9, shape=(2,), dtype=np.int32)
+        self.observation_space = spaces.Box(low=0, high=15, shape=(2,), dtype=np.int32)
         
         # 可视化参数
         self.viewer = None
@@ -47,7 +37,7 @@ class MazeEnv(gym.Env):
         elif action == 3: new_y += 1  # 右
         
         # 检查新位置是否有效
-        if (0 <= new_x < 10 and 0 <= new_y < 10 and 
+        if (0 <= new_x < 16 and 0 <= new_y < 16 and 
             self.maze[new_x, new_y] == 0):
             self.agent_pos = [new_x, new_y]
         
@@ -63,8 +53,8 @@ class MazeEnv(gym.Env):
             self.viewer = rendering.Viewer(500, 500)
             
             # 绘制迷宫
-            for x in range(10):
-                for y in range(10):
+            for x in range(16):
+                for y in range(16):
                     rect = rendering.FilledPolygon([
                         (y*self.cell_size, x*self.cell_size),
                         ((y+1)*self.cell_size, x*self.cell_size),

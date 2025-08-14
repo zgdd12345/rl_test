@@ -3,7 +3,7 @@ import numpy as np
 class QLearningAgent:
     def __init__(self, env, learning_rate=0.1, discount=0.95, epsilon=0.1):
         self.env = env
-        self.q_table = np.zeros((10, 10, 4))  # 10x10网格，4个动作
+        self.q_table = np.zeros((16, 16, 4))  # 16x16网格，4个动作
         self.lr = learning_rate
         self.gamma = discount
         self.epsilon = epsilon
