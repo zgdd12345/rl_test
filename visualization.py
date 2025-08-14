@@ -92,7 +92,7 @@ for episode in range(1000):
         draw_info(elapsed_time, episode, all_time)
         
         pygame.display.flip()
-        clock.tick(1000)  # 控制渲染速度
+        clock.tick(10000)  # 控制渲染速度
         
     if not running:
         break
